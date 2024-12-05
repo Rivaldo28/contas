@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: Sistema de Contas API
+  description: API para gerenciamento de lançamentos, pessoas, categorias e usuários, incluindo autenticação
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081/sistema
+    description: Servidor local
+  - url: https://dev.sistema.com/sistema
+    description: Servidor de desenvolvimento
+  - url: https://hml.sistema.com/sistema
+    description: Servidor de homologação
+  - url: https://prd.sistema.com/sistema
+    description: Servidor de produção
+
+tags:
+  - name: Lançamentos
+    description: Recurso de gerenciamento de lançamentos
+  - name: Pessoas
+    description: Recurso de gerenciamento de pessoas
+  - name: Categorias
+    description: Recurso de gerenciamento de categorias
+  - name: Usuarios
+    description: Recurso de gerenciamento de usuários
+  - name: Auth
+    description: Recurso de autenticação
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Realizar login
+      description: Autentica o usuário e retorna o token de sessão
+      operationId: realizarLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Credenciais inválidas
+        '500':
+          description: Erro interno no servidor
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Realizar logout
+      description: Encerra a sessão do usuário
+      operationId: realizarLogout
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          description: Token de autenticação do usuário
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Logout realizado com sucesso
+        '401':
+          description: Token inválido ou sessão expirada
+        '500':
+          description: Erro interno no servidor
+
+  /auth/session:
+    get:
+      tags:
+        - Auth
+      summary: Obter dados da sessão do usuário
+      description: Retorna os dados do usuário autenticado com base no token fornecido
+      operationId: obterDadosSessao
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          description: Token de autenticação do usuário
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dados do usuário autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSessionResponse'
+        '401':
+          description: Token inválido ou sessão expirada
+        '500':
+          description: Erro interno no servidor
+
+  /usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Listar usuários
+      description: Lista todos os usuários cadastrados no sistema
+      operationId: listarUsuarios
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          description: Token de autenticação do usuário
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de UsuarioDTO
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioDTO'
+        '401':
+          description: Token inválido ou sessão expirada
+        '403':
+          description: Acesso negado
+        '500':
+          description: Erro interno no servidor
+
+    post:
+      tags:
+        - Usuarios
+      summary: Criar um novo usuário
+      description: Cria um novo usuário no sistema (somente ADMIN)
+      operationId: criarUsuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioDTO'
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          description: Token de autenticação do usuário
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Usuário criado com sucesso
+        '400':
+          description: Dados inválidos fornecidos
+        '403':
+          description: Acesso negado
+        '500':
+          description: Erro interno no servidor
+
+  /usuarios/{id}:
+    put:
+      tags:
+        - Usuarios
+      summary: Atualizar usuário
+      description: Atualiza as informações de um usuário existente
+      operationId: atualizarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do usuário a ser atualizado
+          schema:
+            type: integer
+        - name: authorization
+          in: header
+          required: true
+          description: Token de autenticação do usuário
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioDTO'
+      responses:
+        '200':
+          description: Usuário atualizado com sucesso
+        '400':
+          description: Dados inválidos fornecidos
+        '404':
+          description: Usuário não encontrado
+        '403':
+          description: Acesso negado
+        '500':
+          description: Erro interno no servidor
+
+    delete:
+      tags:
+        - Usuarios
+      summary: Deletar usuário
+      description: Deleta um usuário do sistema
+      operationId: deletarUsuario
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do usuário a ser deletado
+          schema:
+            type: integer
+        - name: authorization
+          in: header
+          required: true
+          description: Token de autenticação do usuário
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuário deletado com sucesso
+        '404':
+          description: Usuário não encontrado
+        '403':
+          description: Acesso negado
+        '500':
+          description: Erro interno no servidor
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Nome de usuário ou email
+          example: usuario@exemplo.com
+        password:
+          type: string
+          format: password
+          description: Senha do usuário
+          example: senha123
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token de autenticação JWT gerado
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    UserSessionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID do usuário
+          example: 1
+        nome:
+          type: string
+          description: Nome do usuário
+          example: João da Silva
+        email:
+          type: string
+          description: Email do usuário
+          example: usuario@exemplo.com
+        roles:
+          type: array
+          items:
+            type: string
+          description: Lista de permissões do usuário
+          example: ["ADMIN", "USER"]
+
+    UsuarioDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID do usuário
+          example: 1
+        nome:
+          type: string
+          description: Nome completo do usuário
+          example: Maria Souza
+        email:
+          type: string
+          description: Email do usuário
+          example: maria@exemplo.com
+        roles:
+          type: array
+          items:
+            type: string
+          description: Lista de papéis do usuário
+          example: ["ADMIN", "USER"]
+
+    UsuarioCreateDTO:
+      type: object
+      properties:
+        nome:
+          type: string
+          description: Nome completo do usuário
+          example: Maria Souza
+        email:
+          type: string
+          description: Email do usuário
+          example: maria@exemplo.com
+        password:
+          type: string
+          format: password
+          description: Senha do usuário
+          example: senha123
+        roles:
+          type: array
+          items:
+            type: string
+          description: Lista de papéis do usuário
+          example: ["ADMIN", "USER"]
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensagem de erro detalhada

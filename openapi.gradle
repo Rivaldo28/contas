@@ -1,0 +1,73 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.openapitools:openapi-generator-gradle-plugin:7.2.0"
+    }
+}
+
+apply plugin: 'org.openapi.generator'
+
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+// Diretório de saída para os arquivos gerados
+//def diretorioBuild = layout.buildDirectory
+//def diretorioBuild = buildDir // Usando buildDir diretamente
+def diretorioBuild = layout.buildDirectory.dir('build').get().asFile.path.replaceFirst('build', '')
+def pacoteBase = 'com.grandle.' // Ajuste conforme sua estrutura de pacotes
+def pacoteSpecs = "$rootDir/src/main/resources/swagger/" // Caminho para os arquivos YAML
+
+// Adiciona os diretórios gerados ao source set
+sourceSets.main.java.srcDir file("${diretorioBuild}/generated/src/main/java")
+sourceSets.main.resources.srcDir file("${diretorioBuild}/generated/src/main/resources")
+
+idea {
+    module {
+        generatedSourceDirs += file("${diretorioBuild}/generated/src/main/java")
+    }
+}
+
+// Coleta todos os arquivos YAML na pasta especificada
+List<String> nomesSpecs = fileTree("${pacoteSpecs}").filter { it.isFile() }.files.name
+nomesSpecs.forEach { nome ->
+    def modulo = nome.replaceAll('.yml|.yaml', '')
+
+    String taskName = "openApiGenerate_" + modulo
+    tasks.register(taskName, GenerateTask) {
+        generatorName = 'spring'
+        inputSpec = "${pacoteSpecs}${nome}"
+        outputDir = "${diretorioBuild}/generated"
+        apiPackage = "${pacoteBase}${modulo}.controllers" // Pacote para os controladores
+        modelPackage = "${pacoteBase}${modulo}.dtos" // Pacote para os DTOs
+        invokerPackage = "${pacoteBase}${modulo}.services" // Pacote para serviços, se necessário
+        logToStderr = true
+        configOptions = [
+                serializationLibrary: 'jackson',
+                requestMappingMode: 'api_interface',
+                useSpringBoot3: 'true',
+                interfaceOnly: 'true',
+                unhandledException: 'true',
+                returnSuccessCode: 'true',
+                useTags: 'true',
+                skipDefaultInterface: 'true',
+                hideGenerationTimestamp: 'true',
+                containerDefaultToNull: 'true',
+                generateConstructorWithAllArgs: 'false',
+                generatedConstructorWithRequiredArgs: 'false',
+        ]
+        additionalProperties = [
+                useLombok: true,
+                additionalModelTypeAnnotations: '@lombok.Data @lombok.Builder @lombok.NoArgsConstructor @lombok.AllArgsConstructor'
+        ]
+    }
+
+    // Definindo dependências para que a compilação do Java dependa da geração do OpenAPI
+    tasks.named('compileJava').configure {
+        dependsOn(taskName)
+    }
+    tasks.named('processResources').configure {
+        dependsOn(taskName)
+    }
+}

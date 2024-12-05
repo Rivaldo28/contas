@@ -1,0 +1,321 @@
+openapi: 3.0.3
+info:
+  title: API de Lançamentos
+  description: API para gerenciar lançamentos financeiros
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api/lancamentos
+    description: Servidor local
+  - url: https://api.exemplo.com/lancamentos
+    description: Servidor de produção
+
+tags:
+  - name: Lancamento
+    description: Recurso de gerenciamento de lançamentos financeiros
+
+paths:
+  /lancamentos:
+    get:
+      tags:
+        - Lancamento
+      summary: Listar lançamentos
+      description: Listagem de todos os lançamentos cadastrados com suporte a filtros de descrição e datas
+      operationId: listarLancamentos
+      parameters:
+        - name: descricao
+          in: query
+          required: false
+          description: Filtrar por descrição do lançamento
+          schema:
+            type: string
+        - name: dataInicio
+          in: query
+          required: false
+          description: Data de início para o filtro
+          schema:
+            type: string
+            format: date
+        - name: dataFim
+          in: query
+          required: false
+          description: Data de fim para o filtro
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          required: false
+          description: Número da página
+          schema:
+            type: integer
+            example: 0
+        - name: size
+          in: query
+          required: false
+          description: Tamanho da página
+          schema:
+            type: integer
+            example: 20
+      responses:
+        '200':
+          description: Lista de lançamentos paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaLancamentosResponse'
+              examples:
+                exemplo:
+                  value:
+                    totalElements: 100
+                    totalPages: 5
+                    first: true
+                    last: false
+                    empty: false
+                    pageable:
+                      pageNumber: 0
+                      pageSize: 20
+                      offset: 0
+                      paged: true
+                      unpaged: false
+                    content:
+                      - id: 1
+                        descricao: "Pagamento de fornecedor"
+                        valor: 150.50
+                        dataNascimento: "2000-12-05"
+                        dataPagamento: "2024-12-05"
+                        observacao: "anotação de teste"
+                        tipo: "Despesas"
+                        categoria:
+                          id: 1
+                          nome: "Fornecedor"
+                        pessoa:
+                          id: 2
+                          nome: "Fornecedor Exemplo"
+                      - id: 2
+                        descricao: "Recebimento de cliente"
+                        valor: 500.00
+                        dataNascimento: "2000-12-10"
+                        dataPagamento: "2024-12-10"
+                        observacao: "anotação de teste"
+                        tipo: "Receitas"
+                        categoria:
+                          id: 2
+                          nome: "Cliente"
+                        pessoa:
+                          id: 1
+                          nome: "Cliente Exemplo"
+        '400':
+          description: Requisição inválida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+    post:
+      tags:
+        - Lancamento
+      summary: Adicionar um lançamento
+      description: Criação de um novo lançamento
+      operationId: adicionarLancamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LancamentoDTO'
+      responses:
+        '201':
+          description: Lançamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LancamentoDTO'
+        '400':
+          description: Requisição inválida
+        '500':
+          description: Erro interno do servidor
+
+  /lancamentos/{id}:
+    get:
+      tags:
+        - Lancamento
+      summary: Obter um lançamento
+      description: Obtém um lançamento específico com base no ID fornecido
+      operationId: obterLancamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do lançamento
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lançamento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LancamentoDTO'
+        '404':
+          description: Lançamento não encontrado
+        '500':
+          description: Erro interno do servidor
+
+    put:
+      tags:
+        - Lancamento
+      summary: Atualizar um lançamento
+      description: Atualiza um lançamento existente com base no ID fornecido
+      operationId: atualizarLancamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do lançamento
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LancamentoDTO'
+      responses:
+        '200':
+          description: Lançamento atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LancamentoDTO'
+        '400':
+          description: Requisição inválida
+        '404':
+          description: Lançamento não encontrado
+        '500':
+          description: Erro interno do servidor
+
+    delete:
+      tags:
+        - Lancamento
+      summary: Remover um lançamento
+      description: Remove um lançamento específico com base no ID fornecido
+      operationId: removerLancamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do lançamento
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Lançamento removido com sucesso
+        '404':
+          description: Lançamento não encontrado
+        '500':
+          description: Erro interno do servidor
+
+components:
+  schemas:
+    LancamentoDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        descricao:
+          type: string
+        valor:
+          type: number
+          format: decimal
+        dataNascimento:
+          type: string
+          format: date
+        dataPagamento:
+          type: string
+          format: date
+        observacao:
+          type: string
+        tipo:
+          type: string
+        categoria:
+          $ref: './categoria.yml#/components/schemas/CategoriaDTO'
+        pessoa:
+          $ref: './pessoa.yml#/components/schemas/PessoaDTO'
+      required:
+        - descricao
+        - valor
+        - dataNascimento
+        - dataPagamento
+        - observacao
+        - tipo
+        - categoria
+        - pessoa
+
+    ListaLancamentosResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          minimum: 0
+          description: Número total de lançamentos
+          example: 100
+        totalPages:
+          type: integer
+          minimum: 1
+          description: Número total de páginas
+          example: 5
+        first:
+          type: boolean
+          description: Indica se é a primeira página
+          example: true
+        last:
+          type: boolean
+          description: Indica se é a última página
+          example: false
+        empty:
+          type: boolean
+          description: Indica se a página está vazia
+          example: false
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/LancamentoDTO'
+
+    Pageable:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          description: Número da página
+          example: 0
+        pageSize:
+          type: integer
+          description: Tamanho da página
+          example: 20
+        offset:
+          type: integer
+          description: Deslocamento
+          example: 0
+        paged:
+          type: boolean
+          description: Indica se é paginado
+          example: true
+        unpaged:
+          type: boolean
+          description: Indica se não é paginado
+          example: false

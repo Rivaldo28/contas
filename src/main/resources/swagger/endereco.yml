@@ -1,0 +1,279 @@
+openapi: 3.0.3
+info:
+  title: API de Endereço
+  description: API para gerenciar endereços de usuários
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api/endereco
+    description: Servidor local
+  - url: https://api.exemplo.com/endereco
+    description: Servidor de produção
+tags:
+  - name: Endereco
+    description: Recurso de gerenciamento de endereços
+paths:
+  /enderecos:
+    get:
+      tags:
+        - Endereco
+      summary: Listar endereços
+      description: Listagem de todos os endereços cadastrados com opção de filtragem
+      operationId: listarEnderecos
+      parameters:
+        - name: logradouro
+          in: query
+          required: false
+          description: Filtrar por logradouro
+          schema:
+            type: string
+        - name: bairro
+          in: query
+          required: false
+          description: Filtrar por bairro
+          schema:
+            type: string
+        - name: cidade
+          in: query
+          required: false
+          description: Filtrar por cidade
+          schema:
+            type: string
+        - name: estado
+          in: query
+          required: false
+          description: Filtrar por estado
+          schema:
+            type: string
+            maxLength: 2
+      responses:
+        '200':
+          description: Lista de endereços
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EnderecoDTO'
+        '400':
+          description: Requisição inválida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    post:
+      tags:
+        - Endereco
+      summary: Criar um novo endereço
+      description: Criação de um novo endereço
+      operationId: criarEndereco
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnderecoDTO'
+      responses:
+        '201':
+          description: Endereço criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnderecoDTO'
+        '400':
+          description: Dados inválidos para criação
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /enderecos/{id}:
+    get:
+      tags:
+        - Endereco
+      summary: Obter um endereço
+      description: Obtém um endereço específico com base no ID fornecido
+      operationId: obterEndereco
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do endereço
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Endereço encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnderecoDTO'
+        '404':
+          description: Endereço não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      tags:
+        - Endereco
+      summary: Atualizar um endereço
+      description: Atualiza um endereço existente com base no ID fornecido
+      operationId: atualizarEndereco
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do endereço
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnderecoDTO'
+      responses:
+        '200':
+          description: Endereço atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnderecoDTO'
+        '400':
+          description: Dados inválidos para atualização
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Endereço não encontrado para atualização
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      tags:
+        - Endereco
+      summary: Remover um endereço
+      description: Remove um endereço existente com base no ID fornecido
+      operationId: removerEndereco
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do endereço
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Endereço removido com sucesso
+        '404':
+          description: Endereço não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    EnderecoDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        logradouro:
+          type: string
+          example: "Casa"
+        rua:
+          type: string
+          example: "Rua das flores"
+        numero:
+          type: string
+          example: "123"
+        complemento:
+          type: string
+          example: "Apto 45"
+        bairro:
+          type: string
+          example: "Centro"
+        cep:
+          type: string
+          example: "12345-678"
+        cidade:
+          type: string
+          example: "São Paulo"
+        estado:
+          type: string
+          example: "SP"
+      required:
+        - logradouro
+        - rua
+        - numero
+        - bairro
+        - cep
+        - cidade
+        - estado
