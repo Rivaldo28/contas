@@ -18,6 +18,7 @@ DO $criaçãotabelas$
                                     id BIGINT NOT NULL DEFAULT nextval('sq_usuario') CONSTRAINT pk_usuario PRIMARY KEY UNIQUE,
                                     nome VARCHAR(200) COLLATE pg_catalog."default" NOT NULL,
                                     email VARCHAR(255) NOT NULL,  -- Alterado de CPF para Email
+                                    senha VARCHAR(10) NOT NULL,
                                     CONSTRAINT uq_email_usuario UNIQUE (email), -- Adicionando constraint de unicidade para email
                                     id_usuario_criacao BIGINT NOT NULL DEFAULT 1,
                                     data_criacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

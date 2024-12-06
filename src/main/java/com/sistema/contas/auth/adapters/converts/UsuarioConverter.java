@@ -14,6 +14,7 @@ public class UsuarioConverter {
         usuarioDTO.setId(Math.toIntExact(usuario.getId()));
         usuarioDTO.setNome(usuario.getNome());
         usuarioDTO.setEmail(usuario.getEmail());
+        usuarioDTO.setSenha(usuario.getSenha());
         usuarioDTO.setRoles(
                 usuario.getPerfis() != null
                         ? usuario.getPerfis().stream()
@@ -29,6 +30,7 @@ public class UsuarioConverter {
         usuario.setId(usuarioDTO.getId() != null ? usuarioDTO.getId().longValue() : null); // Converte Integer para Long
         usuario.setNome(usuarioDTO.getNome());
         usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setSenha(usuarioDTO.getSenha());
         usuario.setPerfis(
                 usuarioDTO.getRoles() != null
                         ? usuarioDTO.getRoles().stream()

@@ -264,6 +264,10 @@ components:
           type: string
           description: Email do usuário
           example: usuario@exemplo.com
+        senha:
+          type: string
+          description: Email do usuário
+          example: Senha@2024
         roles:
           type: array
           items:
@@ -286,6 +290,10 @@ components:
           type: string
           description: Email do usuário
           example: maria@exemplo.com
+        senha:
+          type: string
+          description: Email do usuário
+          example: Senha@2024
         roles:
           type: array
           items:
@@ -304,6 +312,10 @@ components:
           type: string
           description: Email do usuário
           example: maria@exemplo.com
+        senha:
+          type: string
+          description: Email do usuário
+          example: Senha@2024
         password:
           type: string
           format: password

@@ -35,6 +35,10 @@ public class Usuario {
     @Email(message = "O email deve ser válido")
     private String email;
 
+    @Column(nullable = false, unique = true, length = 255)
+    @NotBlank(message = "A senha não pode ser vazia")
+    private String senha;
+
     @Column(name = "id_usuario_criacao", nullable = false)
     @NotNull(message = "O id do usuário criador não pode ser nulo")
     private Long idUsuarioCriacao;

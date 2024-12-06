@@ -56,9 +56,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/categorias", "api/categorias", "/api/endereco/", "api/lancamentos/" )
+                        .requestMatchers("/api/endereco/", "api/lancamentos/" )
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categorias", "api/categorias", "/api/endereco/", "api/lancamentos/").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
