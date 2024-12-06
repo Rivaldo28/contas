@@ -1,6 +1,6 @@
 package com.sistema.contas.lancamentos.adapters.controllers;
 
-import com.grandle.lancamento.controllers.LanamentosApi;
+import com.grandle.lancamento.controllers.LancamentoApi;
 import com.grandle.lancamento.dtos.LancamentoDTO;
 import com.grandle.lancamento.dtos.ListaLancamentosResponse;
 import com.sistema.contas.lancamentos.adapters.converters.LancamentoConverter;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/lancamentos")
-public class LancamentoController implements LanamentosApi {
+public class LancamentoController implements LancamentoApi {
 
     private final ILancamentoService lancamentoService;
     private final LancamentoConverter lancamentoConverter;
