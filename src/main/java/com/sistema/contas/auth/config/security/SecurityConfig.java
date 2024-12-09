@@ -37,6 +37,17 @@ public class SecurityConfig {
             "https://sistema.contas.prd"
     };
 
+    private static final String[] SWAGGER_WHITELIST = {
+            "/v3/api-docs/**",       // Documentação OpenAPI
+            "/swagger-ui/**",        // Recursos do Swagger UI
+            "/swagger-ui.html"       // Página inicial do Swagger
+    };
+
+    private static final String[] PUBLIC_ROUTES = {
+            "/api/endereco/enderecos**",
+            "/api/categoria/**"
+    };
+
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -56,9 +67,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/endereco/", "api/lancamentos/" )
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categorias").permitAll()
+                        // Libera rotas públicas
+                        .requestMatchers(PUBLIC_ROUTES).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias/categorias").permitAll()
+                        // Libera rotas do Swagger
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                        // Exige autenticação para outras rotas
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -71,7 +85,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        return (HttpServletRequest request, HttpServletResponse response, org.springframework.security.core.AuthenticationException authException) -> {
+        return (HttpServletRequest request, HttpServletResponse response,
+                org.springframework.security.core.AuthenticationException authException) -> {
             String errorMessage = authException.getMessage();
 
             Map<String, Object> errorDetails = new HashMap<>();

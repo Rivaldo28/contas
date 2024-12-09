@@ -22,22 +22,7 @@ public class JWTUtils {
         return jwt.getClaimAsString("email");
     }
 
-    /**
-     * Extrai o CPF do JWT (caso seja necessário no seu sistema).
-     *
-     * @param jwt O JWT.
-     * @return O CPF contido no JWT.
-     */
-    public static String obterCpf(Jwt jwt) {
-        return jwt.getClaimAsString("preferred_username");
-    }
 
-    /**
-     * Extrai o perfil do usuário no contexto corporativo.
-     *
-     * @param jwt O JWT.
-     * @return O perfil do usuário.
-     */
     public static String obterPerfil(Jwt jwt) {
         List<Map<String, Object>> corporativoList = jwt.getClaim("corporativo");
 

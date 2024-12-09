@@ -34,6 +34,9 @@ spring:
     url: jdbc:postgresql://localhost:5433/contas
     username: postgres
     password: senha
+  jwt:
+    secret:
+      key: testesenhasecreta
   jpa:
     show-sql: true
     properties:
