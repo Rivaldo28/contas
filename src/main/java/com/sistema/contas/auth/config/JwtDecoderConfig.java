@@ -23,7 +23,7 @@ public class JwtDecoderConfig {
 //    }
 
     // O Spring irá injetar o valor da chave secreta definida no application.yml
-    @Value("${jwt.secret.key}")
+    @Value("${spring.jwt.secret.key}")
     private String secretKey;
 
     @Bean

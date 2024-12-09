@@ -44,8 +44,8 @@ public class SecurityConfig {
     };
 
     private static final String[] PUBLIC_ROUTES = {
-            "/api/endereco/enderecos**",
-            "/api/categoria/**"
+            "/api/endereco/enderecos/**",
+            "/api/categorias/**"
     };
 
     @Bean
@@ -68,9 +68,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
                         // Libera rotas públicas
-                        .requestMatchers(PUBLIC_ROUTES).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categorias/categorias").permitAll()
-                        // Libera rotas do Swagger
+                                .requestMatchers("/auth/login").permitAll()
+                                .requestMatchers(HttpMethod.GET, PUBLIC_ROUTES).permitAll()
+//                                .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                                // Libera rotas do Swagger
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         // Exige autenticação para outras rotas
                         .anyRequest().authenticated()

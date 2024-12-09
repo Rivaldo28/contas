@@ -5,13 +5,13 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:8081/sistema
+  - url: http://localhost:8080/auth
     description: Servidor local
-  - url: https://dev.sistema.com/sistema
+  - url: https://dev.sistema.com/auth
     description: Servidor de desenvolvimento
-  - url: https://hml.sistema.com/sistema
+  - url: https://hml.sistema.com/auth
     description: Servidor de homologação
-  - url: https://prd.sistema.com/sistema
+  - url: https://prd.sistema.com/auth
     description: Servidor de produção
 
 tags:
@@ -27,7 +27,7 @@ tags:
     description: Recurso de autenticação
 
 paths:
-  /auth/login:
+  /login:
     post:
       tags:
         - Auth
@@ -52,7 +52,7 @@ paths:
         '500':
           description: Erro interno no servidor
 
-  /auth/logout:
+  /logout:
     post:
       tags:
         - Auth
